@@ -1,0 +1,114 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.2'
+	id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+	id 'java'
+}
+
+group = 'me.represent'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	runtimeOnly 'org.postgresql:postgresql'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+bootRun {
+	def arguments = []
+	arguments << "--spring.config.addtional-location=${projectDir}/config/"
+	if (project.hasProperty('profiles')) {
+		arguments << "--spring.profiles.group.default=${profiles}"
+	}
+	args = arguments
+}
+
+def postgresContainerName = "${project.name}-db"
+def postgresVolumeName  = "${project.name}-postgres"
+def postgresDockerImage = 'postgres:11-alpine'
+def postgresPassword = 'dev'
+
+tasks.register('dbVolumeCreate', Exec) {
+	group 'Database'
+	executable 'docker'
+	args 'volume', 'create', postgresVolumeName
+}
+
+tasks.register('dbVolumeDelete', Exec) {
+	group 'Database'
+	description 'Removes all DB data'
+	executable 'docker'
+	args 'volume', 'rm', postgresVolumeName
+}
+
+tasks.register('dbStart', Exec) {
+	group 'Database'
+	description 'Starts a dockerized DB instance'
+	dependsOn dbVolumeCreate
+	executable 'docker'
+	args 'run', '--rm', '-d',
+			'--name', postgresContainerName,
+			'-e', "POSTGRES_PASSWORD=${postgresPassword}",
+			'-p', '5432:5432',
+			'-it',
+			'-v', "${postgresVolumeName}:/var/lib/postgresql/data",
+			'-v', "${projectDir}/sql/init:/docker-entrypoint-initdb.d",
+			postgresDockerImage
+}
+
+tasks.register('dbStop', Exec) {
+	group 'Database'
+	description 'Stops the running DB instance'
+	executable 'docker'
+	args 'stop', postgresContainerName
+}
+
+tasks.register('mergeDevMigrations', Copy) {
+	group 'Database'
+	description 'Merges migrations and test-data inserts'
+	from "${projectDir}/sql/migration", "${projectDir}/sql/test-data"
+	include "*.sql"
+	into "${buildDir}/sql"
+}
+
+def flywayDockerImage = 'flyway/flyway'
+
+tasks.register('initSchema', Exec) {
+	group 'Database'
+	description 'Creates schema and users'
+	executable 'docker'
+	args 'run', '--rm',
+			'-v', "${projectDir}/sql/schema:/flyway/sql",
+			flywayDockerImage,
+			'-user=postgres',
+			"-password=${postgresPassword}",
+			'-url=jdbc:postgresql://host.docker.internal/representme',
+			"-placeholders.schema_admin_password=${postgresPassword}",
+			"-placeholders.schema_user_password=${postgresPassword}",
+			'-mixed=true',
+			'migrate'
+}
+
+tasks.register('devMigrate', Exec) {
+	group 'Database'
+	description 'Runs migration including test-data inserts'
+	dependsOn mergeDevMigrations
+	executable 'docker'
+	args 'run', '--rm',
+			'-v', "${projectDir}/build/sql:/flyway/sql",
+			flywayDockerImage,
+			'-user=schema_admin',
+			"-password=${postgresPassword}",
+			'-url=jdbc:postgresql://host.docker.internal/representme',
+			'migrate'
+}

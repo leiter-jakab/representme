@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: 'jdbc:postgresql://localhost/representme'
+    username: schema_user
+    password: dev
