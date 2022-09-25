@@ -11,6 +11,10 @@ The application is a single [Spring MVC](https://spring.io/projects/spring-frame
 * Project is currently set up for Windows dev environment with [WSL2](https://docs.microsoft.com/en-us/windows/wsl/) and requires
   * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
   * [Java 17](https://www.azul.com/downloads/?version=java-17-lts&os=ubuntu&package=jdk)
+* Recommended tooling is [VS Code with the following extensions](https://code.visualstudio.com/docs/java/java-spring-boot):
+  * [Remote - WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)
+  * [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
+  * [Spring Boot Extension Pack](https://marketplace.visualstudio.com/items?itemName=Pivotal.vscode-boot-dev-pack)
 
 ### Dev Env
 
