@@ -1,12 +1,12 @@
 package me.represent.data.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,10 +19,11 @@ public class OfficialEntity {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
+    @Column(nullable = false)
     private String name;
 
     @OneToMany
+    @JoinColumn(name = "official")
     private List<OfficialActionEntity> actions;
 
     public UUID getId() {

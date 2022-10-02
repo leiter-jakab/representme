@@ -1,13 +1,12 @@
 package me.represent.data.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.springframework.lang.NonNull;
 
 import java.util.UUID;
 
@@ -19,16 +18,15 @@ public class JurisdictionEntity {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
+    @Column(nullable = false)
     private String name;
 
-    @NonNull
     @ManyToOne
+    @JoinColumn(nullable = false)
     private LocationEntity location;
 
-    @NonNull
     @ManyToOne
-    @JoinColumn(name = "jurisdiction_type")
+    @JoinColumn(name = "jurisdiction_type", nullable = false)
     private JurisdictionTypeEntity type;
 
     public UUID getId() {

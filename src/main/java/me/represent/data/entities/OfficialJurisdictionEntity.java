@@ -3,13 +3,13 @@ package me.represent.data.entities;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "official_jurisdiction")
@@ -19,21 +19,21 @@ public class OfficialJurisdictionEntity {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
     @ManyToOne
+    @JoinColumn(nullable = false)
     private OfficialEntity official;
 
-    @NonNull
     @ManyToOne
+    @JoinColumn(nullable = false)
     private JurisdictionEntity jusrisdiction;
 
-    @NonNull
+    @Column(nullable = false)
     private LocalDate startDate;
 
-    @NonNull
+    @Column(nullable = false)
     private LocalDate endDate;
 
-    @NonNull
+    @Column(nullable = false)
     private String reference;
 
     public UUID getId() {

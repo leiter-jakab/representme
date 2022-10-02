@@ -2,12 +2,11 @@ package me.represent.data.entities;
 
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "jurisdiction_type")
@@ -17,9 +16,10 @@ public class JurisdictionTypeEntity {
     @GeneratedValue
     private UUID id;
 
-    @NonNull
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private int level;
 
     public UUID getId() {
