@@ -20,7 +20,6 @@ public class JurisdictionTypeEntity {
     @NonNull
     private String name;
 
-    @NonNull
     private int level;
 
     public UUID getId() {
